@@ -1,6 +1,8 @@
 require("dotenv").config();
 require("express-async-errors");
 
+const path = require("node:path")
+
 //security packages
 const helmet = require("helmet");
 const cors = require("cors");
@@ -25,6 +27,7 @@ const express = require("express")
 
 
 const app = express();
+app.use(express.static(path.resolve(__dirname, './client/build')))
 app.use(express.json());
 
 // security middlewares
@@ -42,22 +45,13 @@ app.use(xss());
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs/', authMiddleware, jobsRouter);
 
-app.get('/', (req, res)=>{
-    res.send("Hello you")
+app.get('*', (req, res)=>{
+    res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
 });
-
-const errorHandling = (err, req, res, next) => {
-    res.status(500).json({
-      msg: err.message,
-      success: "hi there",
-    });
-  };
-
 
 // custom middlewares
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware)
-app.use(errorHandling);
 
 
 
