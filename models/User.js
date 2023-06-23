@@ -9,6 +9,12 @@ const UserSchema = new mongoose.Schema({
         minlength: 4,
         maxlength: 50
     },
+    lastName: {
+        type: String,
+        trim: true,
+        maxlength: 50,
+        default: '-'
+    },
     email: {
         type: String,
         required: [true, 'Please provide email'],
@@ -20,6 +26,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide password'],
         minlength: 4
+    },
+    location: {
+        type: String,
+        trim: true,
+        maxlength: 50, 
+        default: '-'
     }
 });
 
