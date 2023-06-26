@@ -35,15 +35,45 @@ const login = async (req, res) =>{
 
     const token = user.createJWT();
 
-    const userObject = {
-        name: user.name,
-        email: user.email,
-        lastName: user.lastName,
-        location: user.location,
-        token: token
-    }
-
-    res.status(StatusCodes.OK).json({user: userObject});
+    res.status(StatusCodes.OK).json({
+        user: {
+            name: user.name,
+            email: user.email,
+            lastName: user.lastName,
+            location: user.location,
+            token: token
+        }
+    });
 }
 
-module.exports = {register, login}
+const updateUser = async (req, res) => {
+    const {email, name, lastName, location} = req.body;
+    if (! email || ! name || ! lastName || ! location)  {
+        throw new BadRequestError("Please provide all the values")
+    }
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+    //console.log(user._id, req.user )
+    
+    user.email = email;
+    user.name = name;
+    user.lastName = lastName;
+    user.location = location;
+
+    await user.save();
+
+    const token = user.createJWT();
+
+    user.token = token;
+    
+    res.status(StatusCodes.OK).json({
+        user:{
+            name: user.name,
+            lastName: user.lastName,
+            location: user.location,
+            name: user.name,
+            token
+        }})
+}
+
+module.exports = {register, login, updateUser}
