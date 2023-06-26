@@ -71,7 +71,7 @@ const updateUser = async (req, res) => {
             name: user.name,
             lastName: user.lastName,
             location: user.location,
-            name: user.name,
+            email: user.email,
             token
         }})
 }
