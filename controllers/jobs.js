@@ -6,7 +6,7 @@ const getAllJobs = async (req, res) =>{
     const userId = req.user.userId;
     const jobs = await Job.find({userId}).sort('createdAt');
     //res.status(200).json(req.user);
-    res.status(StatusCodes.OK).json(jobs)
+    res.status(StatusCodes.OK).json({jobs})
 }
 
 const getJob = async (req, res) =>{
@@ -17,12 +17,12 @@ const getJob = async (req, res) =>{
     if (!job) {
         throw new NotFoundError(`Not job with id ${jobId}`)
     }
-    res.status(StatusCodes.OK).json(job);
+    res.status(StatusCodes.OK).json({job});
 }
 
 const createJob = async (req, res) =>{
     req.body.userId = req.user.userId;
-    console.log(req.body, req.user)
+    //console.log(req.body, req.user)
     const job = await Job.create(req.body);
     //console.log(job)
     res.status(StatusCodes.CREATED).json(job)
@@ -34,7 +34,7 @@ const updateJob = async (req, res) =>{
     const updateParams = req.body;
     //console.log('here!!  ', updateParams, typeof updateParams);
 
-    const availableToUpdate = ["company", "position", "status"];
+    const availableToUpdate = ["company", "position", "status", "jobType", "jobLocation"];
 
     Object.keys(updateParams).forEach(par=>{
         if (!availableToUpdate.includes(par)) {

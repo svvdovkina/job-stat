@@ -13,13 +13,23 @@ const JobSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["applied", "interview", "declined"],
-        default: "applied"
+        enum: ["pending", "interview", "declined"],
+        default: "pending"
     },
     userId: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
         required: [true, "Please provide userId"],
+    },
+    jobType: {
+        type: String,
+        enum: ['full-time', 'part-time', 'remote', 'internship'],
+        default: 'full-time'
+    },
+    jobLocation: {
+        type: String,
+        default: "-",
+        required: true
     }
 
 }, {timestamps: true})
