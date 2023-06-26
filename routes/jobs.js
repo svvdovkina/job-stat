@@ -5,16 +5,17 @@ const {
     updateJob,
     deleteJob
 } = require("../controllers/jobs")
+const restrictTestUser = require("../middleware/testUser");
 
 const express = require("express");
 const router = express.Router();
 
 router.route('/')
         .get(getAllJobs)
-        .post(createJob);
+        .post(restrictTestUser, createJob);
 router.route('/:id')
         .get(getJob)
-        .patch(updateJob)
-        .delete(deleteJob)
+        .patch(restrictTestUser, updateJob)
+        .delete(restrictTestUser, deleteJob)
 
 module.exports = router
