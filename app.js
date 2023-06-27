@@ -34,7 +34,10 @@ app.use(express.json());
 app.set('trust proxy', 1);
 app.use(rateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100
+    max: 100,
+    message: {
+        msg: 'Too many requests from this IP, please try again after 15 mins'
+    }
 }))
 app.use(helmet());
 app.use(cors());

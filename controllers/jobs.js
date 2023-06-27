@@ -1,6 +1,54 @@
+const mongoose = require("mongoose");
+const moment = require("moment");
+
 const Job = require("../models/Job");
 const {StatusCodes} = require("http-status-codes");
 const {BadRequestError, NotFoundError} = require("../errors");
+
+const showStats = async (req, res) => {
+    const userId = req.user.userId;
+    //console.log(userId);
+    let stats = await Job.aggregate([
+        {$match :{ userId: new mongoose.Types.ObjectId(userId)}}, 
+        {$group: { _id: '$status', count: {$sum: 1}}},
+    ])
+
+    stats = stats.reduce((acc, it)=>{
+        acc[it._id] = it.count;
+        return acc
+    }, {});
+    //console.log(stats);
+
+    const defaultStats = {
+        pending: stats.pending || 0,
+        interview: stats.interview || 0,
+        declined: stats.declined || 0
+    }
+
+    let monthlyApplications = await Job.aggregate([
+        {$match : {userId: new mongoose.Types.ObjectId(userId)}},
+        {$group: {
+            _id: {year: {$year:'$createdAt'}, month: {$month:'$createdAt'}},
+            count: {$sum: 1}
+        }},
+        { $sort: { '_id.year': -1, '_id.month': -1}},
+        { $limit: 6}
+    ])
+
+    monthlyApplications = monthlyApplications.map(it=>{
+        const year = it._id.year;
+        const month = it._id.month;
+        const date = moment().month(month -1).year(year).format('MMM Y');
+        const count = it.count;
+        return {date, count}
+    }).reverse();
+    //console.log(monthlyApplications)
+
+    res.status(StatusCodes.OK).json({
+        defaultStats: defaultStats, 
+        monthlyApplications: monthlyApplications
+    })
+}
 
 const getAllJobs = async (req, res) =>{
     const userId = req.user.userId;
@@ -119,5 +167,6 @@ module.exports = {
     getJob,
     createJob,
     updateJob,
-    deleteJob
+    deleteJob,
+    showStats
 }
